@@ -1,6 +1,6 @@
 #[allow(dead_code)]
 struct CPU {
-    registers: [u8; 2],
+    registers: [u8; 16],
     // allows indexing
     position_in_memory: usize,
     memory: [u8; 0x1000],
@@ -22,18 +22,25 @@ impl CPU {
     fn run(&mut self) {
         // Select single nibbles with the AND operator to filter bits,
         // then move the bits to the lowest signficant place.
-        // loop {
-        let opcode = self.read_opcode();
-        let c = ((opcode & 0xF000) >> 12) as u8;
-        let x = ((opcode & 0x0F00) >> 8) as u8;
-        let y = ((opcode & 0x00F0) >> 4) as u8;
-        let d = ((opcode & 0x000F) >> 0) as u8;
+        loop {
+            let opcode = self.read_opcode();
 
-        match (c, x, y, d) {
-            (0x8, _, _, 0x4) => self.add_xy(x, y),
-            _ => todo!("opcode {:04x}", opcode),
+            // Increment to next instruction
+            self.position_in_memory += 2;
+
+            let c = ((opcode & 0xF000) >> 12) as u8;
+            let x = ((opcode & 0x0F00) >> 8) as u8;
+            let y = ((opcode & 0x00F0) >> 4) as u8;
+            let d = ((opcode & 0x000F) >> 0) as u8;
+
+            match (c, x, y, d) {
+                (0, 0, 0, 0) => {
+                    return;
+                }
+                (0x8, _, _, 0x4) => self.add_xy(x, y),
+                _ => todo!("opcode {:04x}", opcode),
+            }
         }
-        // }
     }
 
     fn add_xy(&mut self, x: u8, y: u8) {
@@ -55,20 +62,25 @@ impl CPU {
 
 fn main() {
     let mut cpu = CPU {
-        current_operation: 0,
-        registers: [0; 2],
+        registers: [0; 16],
+        memory: [0; 4096],
+        position_in_memory: 0,
     };
 
-    // 8 = operation
-    // 0 = cpu.registers[0]
-    // 1 = cpu.registers[1]
-    // 4 = addition
-    cpu.current_operation = 0x8014;
     cpu.registers[0] = 5;
     cpu.registers[1] = 10;
+    cpu.registers[2] = 10;
+    cpu.registers[3] = 10;
 
+    let mem = &mut cpu.memory;
+    mem[0] = 0x80;
+    mem[1] = 0x14;
+    mem[2] = 0x80;
+    mem[3] = 0x14;
+    mem[4] = 0x80;
+    mem[5] = 0x14;
     cpu.run();
 
-    assert_eq!(cpu.registers[0], 15);
-    println!("5+10 = {}", cpu.registers[0]);
+    assert_eq!(cpu.registers[0], 35);
+    println!("5+10+10+10 = {}", cpu.registers[0]);
 }
