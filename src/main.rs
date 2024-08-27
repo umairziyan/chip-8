@@ -37,7 +37,19 @@ impl CPU {
     }
 
     fn add_xy(&mut self, x: u8, y: u8) {
-        self.registers[x as usize] += self.registers[y as usize];
+        // Last register is used as carry flag. When set, the flag indicates
+        // that an operation has overflowed the register size.
+        let arg1 = self.registers[x as usize];
+        let arg2 = self.registers[y as usize];
+
+        let (val, overflow) = arg1.overflowing_add(arg2);
+        self.registers[x as usize] = val;
+
+        if overflow {
+            self.registers[0xF] = 1;
+        } else {
+            self.registers[0xF] = 0;
+        }
     }
 }
 
