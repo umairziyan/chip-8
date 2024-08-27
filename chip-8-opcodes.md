@@ -16,6 +16,6 @@ Each opcode is made up of two bytes: the _high byte_ and the _low bite_. Each by
 
 The decoding process involves matching on the high nibble of the first byte and applying one of three strategies.
 
-![method 1]("/images/method-1.png")
-![method 2]("/images/method-2.png")
-![method 3]("/images/method-3.png")
+![method 1](images/method-1.png)
+![method 2](images/method-2.png)
+![method 3](images/method-3.png)
