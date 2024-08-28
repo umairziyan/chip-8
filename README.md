@@ -1,3 +1,3 @@
-# Changes from original chip-8 implementation
+# CHIP-8 Implementation
 
-First 512 bytes (0x100) are reserved for system, this implementation relaxes that restriction.
+Simple implementation of CHIP-8 cpu with an adder, a multiplier, and a stack.
